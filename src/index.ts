@@ -1,6 +1,5 @@
 import Fastify from "fastify";
-import * as ws from "fastify-websocket";
-import { database } from "./database/index.js";
+import { Database } from "./database/index.js";
 import fws from "fastify-websocket";
 
 const server = Fastify({
@@ -12,12 +11,12 @@ server.get("/ping", async (request, reply) => {
     return "pong\n";
 });
 
-const db = new database();
+const db = new Database();
 db.init();
 
 server.get("/ws", { websocket: true }, (connection, request) => {
     connection.socket.on("message", (message) => {
-        db.write(message.toString());
+        db.write(message.toString(), "value");
         console.log(message.toString());
         connection.socket.send("hi from server");
     });

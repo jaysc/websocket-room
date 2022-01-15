@@ -1,42 +1,33 @@
-import { join, dirname } from "path";
+import { join } from "path";
 import { Low, JSONFile } from "lowdb";
 
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-const __filename = fileURLToPath(import.meta.url);
+import * as _ from "lodash-es";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export type Data = {
-    posts: string[]; // Expect posts to be an array of strings
-};
-
-export class database {
-    database: Low<Data>;
+export class Database<Type extends Object> {
+    database: Low<Type>;
 
     constructor() {
         const file = join(__dirname, "db.json");
-        const adapter = new JSONFile<Data>(file);
-        this.database = new Low<Data>(adapter);
+        const adapter = new JSONFile<Type>(file);
+        this.database = new Low<Type>(adapter);
     }
 
     public async init() {
-        this.database.data = { posts: [] };
+        this.database.data = {} as Type;
 
         await this.database.write();
     }
 
-    public async write(input: string): Promise<boolean> {
+    public async write(path: string, value: string | number | boolean | null) {
         this.database.read();
 
-        if (this.database.data != null) {
-            const { posts } = this.database.data;
-            posts.push(input);
-            console.log("data written");
-        }
+        _.set(this.database.data as object, path, value);
 
         await this.database.write();
-
-        return true;
     }
 }
