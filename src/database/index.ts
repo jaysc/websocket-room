@@ -17,17 +17,26 @@ export class Database<Type extends Object> {
         this.database = new Low<Type>(adapter);
     }
 
-    public async init() {
+    public async reset() {
         this.database.data = {} as Type;
 
         await this.database.write();
     }
 
-    public async write(path: string, value: string | number | boolean | null) {
+    public async write(
+        path: string,
+        value?: object | string | number | boolean
+    ) {
         this.database.read();
 
         _.set(this.database.data as object, path, value);
 
         await this.database.write();
+    }
+
+    public async read(path: string) {
+        this.database.read();
+
+        return _.get(this.database.data as object, path);
     }
 }
