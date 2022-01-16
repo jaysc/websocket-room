@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "fastify": "^3.25.3",
+    "fastify-cookie": "^5.5.0",
     "fastify-websocket": "^4.0.0",
     "lodash-es": "^4.17.21",
     "lowdb": "^3.0.0",

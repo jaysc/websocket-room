@@ -1,14 +1,17 @@
 import { RawData } from "ws";
 import * as _ from "lodash-es";
 import { MethodRoute, Method } from "./method.js";
+import { User } from "../user/index.js";
 
 class Action {
     public data: object | string;
     public method: Method;
+    public user: User;
 
-    constructor(data: object, method: Method) {
+    constructor(data: object, method: Method, user: User) {
         this.data = data;
         this.method = method;
+        this.user = user;
     }
 
     public execute() {
@@ -16,17 +19,13 @@ class Action {
     }
 }
 
-export const ParseData = (rawData?: RawData): Action | null => {
-    if (rawData == null) {
-        return null;
-    }
-
+export const ParseData = (rawData: RawData, user: User): Action | null => {
     try {
         let parsedData = JSON.parse(rawData.toString());
 
         let parsedMethod = Route(_.get(_.get(parsedData, "method"), "method"));
         if (parsedMethod) {
-            return new Action(_.get(parsedData, "data"), parsedMethod);
+            return new Action(_.get(parsedData, "data"), parsedMethod, user);
         }
     } catch (ex) {
         console.warn(`Error parsing data: ${ex}`);

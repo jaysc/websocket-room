@@ -1,7 +1,9 @@
 import Fastify from "fastify";
 import { Database } from "./database/index.js";
 import { ParseData } from "./websocket/index.js";
-import fws from "fastify-websocket";
+import fws, { SocketStream } from "fastify-websocket";
+import fc from "fastify-cookie";
+import { User } from "./user/index.js";
 
 const server = Fastify({
     logger: true,
@@ -11,6 +13,9 @@ server.register(fws, {
         clientTracking: true,
     },
 });
+server.register(fc, {
+    secret: "secret",
+});
 
 server.get("/ping", async (request, reply) => {
     return "pong\n";
@@ -19,14 +24,29 @@ server.get("/ping", async (request, reply) => {
 const db = new Database();
 db.reset();
 
+type connection = SocketStream & {
+    user?: User;
+};
+
 server.route({
     method: "GET",
     url: "/ws",
-    wsHandler: (con, request) => {
-        con.socket.on("upgrade", (req) => {});
+    wsHandler: (con: connection, request) => {
+        //'Connection' event
+        if (!con.user) {
+            //Retrieve existing user here
+            const userId = request.cookies.userId;
+            con.user = new User(userId);
+        }
+        
+        console.log(con.user);
 
+        //I believe fastify-websocket only emits 'message' and 'close'. Need to examine other ways to handle this, potentially manually
         con.socket.on("message", (message) => {
-            const action = ParseData(message);
+            console.log("User message");
+
+            server.websocketServer.clients;
+            const action = ParseData(message, new User());
 
             if (action == null) {
                 //Not json, do nothing.
@@ -34,7 +54,7 @@ server.route({
             }
 
             action.execute();
-            
+
             con.socket.send("hi from server");
         });
 
@@ -43,6 +63,7 @@ server.route({
         });
     },
     handler: (req, reply) => {
+        console.log("http hit");
         reply.send({ hello: "world" });
     },
 });
