@@ -24,8 +24,10 @@ server.get("/ping", async (request, reply) => {
 const db = new Database();
 db.reset();
 
-type connection = SocketStream & {
+//Websocket stuff should be moved to it's own controller.
+export type connection = SocketStream & {
     user?: User;
+    roomId?: string;
 };
 
 server.route({
@@ -34,11 +36,11 @@ server.route({
     wsHandler: (con: connection, request) => {
         //'Connection' event
         if (!con.user) {
-            //Retrieve existing user here
+            //Retrieve existing user here from cookie (or maybe session id)
             const userId = request.cookies.userId;
             con.user = new User(userId);
         }
-        
+
         console.log(con.user);
 
         //I believe fastify-websocket only emits 'message' and 'close'. Need to examine other ways to handle this, potentially manually

@@ -35,7 +35,27 @@ export const ParseData = (rawData: RawData, user: User): Action | null => {
     return null;
 };
 
-const CreateRoom: Method = (data) => {};
+interface ConnectData extends Object {
+    roomId: string;
+    password?: string;
+}
+const Connect: Method = (data, user) => {
+    //Connect to room if exists, else create new room.
+};
+
+interface DisconnectData extends Object {
+    roomId?: string; //no roomId means disconnect from all
+}
+const Disconnect: Method = (data, user) => {
+    //Disconnect from room
+};
+
+interface MessageData extends Object {
+    message?: string;
+}
+const Message: Method = (data: MessageData, user) => {
+    //send a message
+};
 
 export const Route = (method?: string): Method | null => {
     if (method == null) {
@@ -45,9 +65,13 @@ export const Route = (method?: string): Method | null => {
         MethodRoute[method as keyof typeof MethodRoute];
 
     switch (parsedMethod) {
-        case MethodRoute.CreateRoom:
-            return CreateRoom;
+        case MethodRoute.Connect:
+            return Connect;
             break;
+        case MethodRoute.Disconnect:
+            return Disconnect;
+        case MethodRoute.Message:
+            return Message;
         default:
             console.log(`Method not found: ${parsedMethod}`);
             break;

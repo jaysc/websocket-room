@@ -1,5 +1,11 @@
+import { User } from "../user";
+
 export enum MethodRoute {
-    CreateRoom,
+    Connect,
+    Disconnect,
+    Message,
 }
 
-export type Method = (data?: object | string) => void;
+export interface Method {
+    (data: object, user: User): void;
+}
