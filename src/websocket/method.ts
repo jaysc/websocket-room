@@ -1,11 +1,17 @@
+import { WebSocketServer } from "ws";
 import { User } from "../user";
 
 export enum MethodRoute {
-    Connect,
-    Disconnect,
-    Message,
+  JoinRoom,
+  LeaveRoom,
+  Message,
 }
 
+export type Result = {
+  message?: string;
+  err?: Error;
+};
+
 export interface Method {
-    (data: object, user: User): void;
+  (data: object, user: User, ws: WebSocketServer): Result;
 }

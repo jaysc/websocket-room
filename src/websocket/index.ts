@@ -1,81 +1,72 @@
-import { RawData } from "ws";
+import { RawData, WebSocket, WebSocketServer } from "ws";
 import * as _ from "lodash-es";
-import { MethodRoute, Method } from "./method.js";
+import { MethodRoute, Method, Result } from "./method.js";
 import { User } from "../user/index.js";
+import JoinRoom from "./joinRoom.js";
+import LeaveRoom from "./leaveRoom.js";
+import Message from "./message.js";
 
 class Action {
-    public data: object | string;
-    public method: Method;
-    public user: User;
+  public data: object;
+  public method: Method;
+  public methodName: string;
+  public user: User;
 
-    constructor(data: object, method: Method, user: User) {
-        this.data = data;
-        this.method = method;
-        this.user = user;
-    }
+  constructor(data: object, methodName: string, method: Method, user: User) {
+    this.data = data;
+    this.methodName = methodName;
+    this.method = method;
+    this.user = user;
+  }
 
-    public execute() {
-        this.method(this.data);
-    }
+  public execute(ws: WebSocketServer): Result {
+    console.log(`Executing method ${this.methodName}`);
+    return this.method(this.data, this.user, ws);
+  }
 }
 
-export const ParseData = (rawData: RawData, user: User): Action | null => {
-    try {
-        let parsedData = JSON.parse(rawData.toString());
+export const ParseData = (payload: RawData, user: User): Action | null => {
+  try {
+    let parsedData = JSON.parse(payload.toString());
+    console.log(parsedData);
+    const methodName = _.get(parsedData, "method");
 
-        let parsedMethod = Route(_.get(_.get(parsedData, "method"), "method"));
-        if (parsedMethod) {
-            return new Action(_.get(parsedData, "data"), parsedMethod, user);
-        }
-    } catch (ex) {
-        console.warn(`Error parsing data: ${ex}`);
-        return null;
+    let parsedMethod = Route(methodName);
+    if (parsedMethod) {
+      return new Action(
+        _.get(parsedData, "data"),
+        methodName,
+        parsedMethod,
+        user
+      );
     }
-
+  } catch (ex) {
+    console.warn(`Error parsing data:`, payload.toString());
+    console.warn("Exception:", ex);
     return null;
-};
+  }
 
-interface ConnectData extends Object {
-    roomId: string;
-    password?: string;
-}
-const Connect: Method = (data, user) => {
-    //Connect to room if exists, else create new room.
-};
-
-interface DisconnectData extends Object {
-    roomId?: string; //no roomId means disconnect from all
-}
-const Disconnect: Method = (data, user) => {
-    //Disconnect from room
-};
-
-interface MessageData extends Object {
-    message?: string;
-}
-const Message: Method = (data: MessageData, user) => {
-    //send a message
+  return null;
 };
 
 export const Route = (method?: string): Method | null => {
-    if (method == null) {
-        return null;
-    }
-    var parsedMethod: MethodRoute =
-        MethodRoute[method as keyof typeof MethodRoute];
-
-    switch (parsedMethod) {
-        case MethodRoute.Connect:
-            return Connect;
-            break;
-        case MethodRoute.Disconnect:
-            return Disconnect;
-        case MethodRoute.Message:
-            return Message;
-        default:
-            console.log(`Method not found: ${parsedMethod}`);
-            break;
-    }
-
+  if (method == null) {
     return null;
+  }
+  var parsedMethod: MethodRoute =
+    MethodRoute[method as keyof typeof MethodRoute];
+
+  switch (parsedMethod) {
+    case MethodRoute.JoinRoom:
+      return JoinRoom;
+    case MethodRoute.LeaveRoom:
+      return LeaveRoom;
+    case MethodRoute.Message:
+      return Message;
+    default:
+      console.log(`Method not found: ${parsedMethod}`);
+      break;
+  }
+
+  return null;
 };
