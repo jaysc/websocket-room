@@ -1,9 +1,7 @@
 import * as _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
-import { WebSocketServer } from "ws";
-import { connection } from "..";
 import { User } from "../user";
-import { Result } from "../websocket/method";
+import { Result } from "../actions";
 
 export type uuid = string & { readonly _: unique symbol };
 

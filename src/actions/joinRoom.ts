@@ -1,13 +1,12 @@
-import { Room } from "../room/index.js";
 import { User } from "../user/index.js";
-import { Method, Result } from "./method.js";
+import { Method, Result } from "./index.js";
 
 type RoomInfo = Object & {
   name?: string;
   password?: string;
 };
 
-const JoinRoom: Method = (data: RoomInfo, user: User): Result => {
+export const JoinRoom: Method = (data: RoomInfo, user: User): Result => {
   const { name, password } = data;
 
   if (!name) {
@@ -16,5 +15,3 @@ const JoinRoom: Method = (data: RoomInfo, user: User): Result => {
 
   return global.rooms.JoinRoom(user, name, password);
 };
-
-export default JoinRoom;

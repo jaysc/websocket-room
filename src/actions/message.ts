@@ -1,15 +1,10 @@
-import { WebSocketServer } from "ws";
 import { User } from "../user";
-import { Method, Result } from "./method";
+import { Method, Result } from ".";
 
 interface MessageData extends Object {
   message?: string;
 }
-const Message: Method = (
-  data: MessageData,
-  user: User,
-  ws: WebSocketServer
-): Result => {
+export const Message: Method = (data: MessageData, user: User): Result => {
   if (!data.message) {
     return { message: "No message" };
   }
@@ -22,5 +17,3 @@ const Message: Method = (
   user.room?.SendMessage(data.message, user);
   return { message: "Message Sent" };
 };
-
-export default Message;

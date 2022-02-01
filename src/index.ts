@@ -2,11 +2,11 @@ import Fastify from "fastify";
 import * as _ from "lodash-es";
 
 import { Database } from "./database/index.js";
-import { ParseData } from "./websocket/index.js";
 import fws, { SocketStream } from "fastify-websocket";
 import fc from "fastify-cookie";
 import { User } from "./user/index.js";
 import { Rooms } from "./room/index.js";
+import { WsHandler } from "./websocket/wsHandler.js";
 
 const server = Fastify({
   logger: true,
@@ -39,50 +39,7 @@ global.connections = new Map<string, connection>();
 server.route({
   method: "GET",
   url: "/ws",
-  wsHandler: (con: connection, request) => {
-    //'Connection' event
-    if (!con.user) {
-      //Retrieve existing user here from cookie (or maybe session id)
-      const userId = request.cookies.userId;
-      con.user = new User(userId);
-
-      global.connections.set(con.user.id, con);
-    }
-
-    //I believe fastify-websocket only emits 'message' and 'close'. Need to examine other ways to handle this, potentially manually
-    con.socket.on("message", (message) => {
-      console.log(con.user);
-
-      if (!con.user) {
-        const userId = request.cookies.userId;
-        con.user = new User(userId);
-      }
-
-      const action = ParseData(message, con.user);
-
-      if (action == null) {
-        //Not json, do nothing.
-        return;
-      }
-
-      const result = action.execute(server.websocketServer);
-
-      console.log(result);
-      con.socket.send(
-        JSON.stringify({
-          message: result.message,
-          err: result.err?.message,
-        })
-      );
-    });
-
-    con.socket.on("close", () => {
-      if (con.user) {
-        con.user.leaveRoom();
-        global.connections.delete(con.user.id);
-      }
-    });
-  },
+  wsHandler: WsHandler(server),
   handler: (req, reply) => {
     console.log("http hit");
     reply.send({ hello: "world" });

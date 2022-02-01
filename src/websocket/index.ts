@@ -1,10 +1,11 @@
-import { RawData, WebSocket, WebSocketServer } from "ws";
+import type { RawData, WebSocketServer } from "ws";
 import * as _ from "lodash-es";
-import { MethodRoute, Method, Result } from "./method.js";
-import { User } from "../user/index.js";
-import JoinRoom from "./joinRoom.js";
-import LeaveRoom from "./leaveRoom.js";
-import Message from "./message.js";
+import type { Method, Result } from "../actions/index.js";
+import { MethodRoute, JoinRoom, LeaveRoom, Message } from "../actions/index.js";
+import type { User } from "../user/index.js";
+
+export { OnMessage } from "./onMessage.js";
+export { WsHandler } from "./wsHandler.js";
 
 class Action {
   public data: object;
