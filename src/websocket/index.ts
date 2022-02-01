@@ -1,11 +1,9 @@
 import type { RawData, WebSocketServer } from "ws";
-import * as _ from "lodash-es";
 import type { Method, Result } from "../actions/index.js";
-import { MethodRoute, JoinRoom, LeaveRoom, Message } from "../actions/index.js";
+import { Actions, JoinRoom, LeaveRoom, Message } from "../actions/index.js";
 import type { User } from "../user/index.js";
 
-export { OnMessage } from "./onMessage.js";
-export { WsHandler } from "./wsHandler.js";
+import * as _ from "lodash-es";
 
 class Action {
   public data: object;
@@ -54,15 +52,14 @@ export const Route = (method?: string): Method | null => {
   if (method == null) {
     return null;
   }
-  var parsedMethod: MethodRoute =
-    MethodRoute[method as keyof typeof MethodRoute];
+  var parsedMethod: Actions = Actions[method as keyof typeof Actions];
 
   switch (parsedMethod) {
-    case MethodRoute.JoinRoom:
+    case Actions.JoinRoom:
       return JoinRoom;
-    case MethodRoute.LeaveRoom:
+    case Actions.LeaveRoom:
       return LeaveRoom;
-    case MethodRoute.Message:
+    case Actions.Message:
       return Message;
     default:
       console.log(`Method not found: ${parsedMethod}`);
@@ -71,3 +68,6 @@ export const Route = (method?: string): Method | null => {
 
   return null;
 };
+
+export { OnMessage } from "./onMessage.js";
+export { WsHandler } from "./wsHandler.js";

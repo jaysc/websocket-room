@@ -1,6 +1,6 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { OnMessage } from "./onMessage.js";
-import { connection } from "../index.js";
+import type { connection } from "../index.js";
 import { User } from "../user/index.js";
 
 export const WsHandler =

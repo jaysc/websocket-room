@@ -1,10 +1,12 @@
-import { WebSocketServer } from "ws";
-import { User } from "../user/index.js";
+import type { WebSocketServer } from "ws";
+import type { User } from "../user/index.js";
 
-export enum MethodRoute {
+export enum Actions {
   JoinRoom,
   LeaveRoom,
   Message,
+  Set,
+  Get,
 }
 
 export type Result = {

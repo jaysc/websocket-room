@@ -1,5 +1,5 @@
-import { User } from "../user/index.js";
-import { Method, Result } from "./index.js";
+import type { User } from "../user/index.js";
+import type { Method, Result } from "./index.js";
 
 type RoomInfo = Object & {
   name?: string;

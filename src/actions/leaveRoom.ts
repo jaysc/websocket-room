@@ -1,4 +1,4 @@
-import { Method, Result } from "./index.js";
+import type { Method, Result } from "./index.js";
 
 export const LeaveRoom: Method = (data, user): Result => {
   if (!user.room) {

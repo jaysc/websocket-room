@@ -1,29 +1,29 @@
 import * as _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "../user";
-import { Result } from "../actions";
+import type { Result } from "../actions";
 
 export type uuid = string & { readonly _: unique symbol };
 
 export class Room {
   public id: uuid;
-  private Password?: string;
+  #Password?: string;
   public userIds: Array<string> = [];
 
   public name: string;
 
   constructor(name: string, password?: string) {
     this.id = uuidv4() as uuid;
-    this.Password = password;
+    this.#Password = password;
 
     this.name = name;
   }
 
-  public HasPassword = () => !_.isEmpty(this.Password);
+  public HasPassword = () => !_.isEmpty(this.#Password);
 
   public PasswordAccept(password?: string) {
     if (this.HasPassword()) {
-      return password === this.Password;
+      return password === this.#Password;
     }
     return false;
   }
@@ -63,7 +63,7 @@ export class Room {
 }
 
 export class Rooms {
-  private rooms: { [RoomId: uuid]: Room } = {};
+  #rooms: { [RoomId: uuid]: Room } = {};
 
   public JoinRoom(user: User, name: string, password?: string): Result {
     let room = this.FindRoomByName(name);
@@ -71,7 +71,7 @@ export class Rooms {
     if (room == null) {
       //Create room
       room = new Room(name, password);
-      this.rooms[room.id] = room;
+      this.#rooms[room.id] = room;
 
       console.log("Room created");
       user.JoinRoom(room);
@@ -95,12 +95,12 @@ export class Rooms {
   }
 
   private FindRoomByName(name: string): Room | undefined {
-    return _.find(this.rooms, (room) => {
+    return _.find(this.#rooms, (room) => {
       return room.name === name;
     });
   }
 
   private FindRoomById(id: uuid): Room | null {
-    return this.rooms[id];
+    return this.#rooms[id];
   }
 }

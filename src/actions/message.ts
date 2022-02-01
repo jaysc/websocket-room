@@ -1,5 +1,5 @@
 import { User } from "../user";
-import { Method, Result } from ".";
+import type { Method, Result } from ".";
 
 interface MessageData extends Object {
   message?: string;
