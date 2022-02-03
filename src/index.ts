@@ -1,12 +1,16 @@
 import Fastify from "fastify";
 import * as _ from "lodash-es";
+import * as fs from "fs";
 
-import { Database } from "./database/index.js";
 import fws, { SocketStream } from "fastify-websocket";
 import fc from "fastify-cookie";
 import { User } from "./user/index.js";
 import { Rooms } from "./room/index.js";
 import { WsHandler } from "./websocket/wsHandler.js";
+import path, { join } from "path/win32";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const server = Fastify({
   logger: true,
@@ -24,9 +28,6 @@ server.get("/ping", async (request, reply) => {
   return "pong\n";
 });
 
-const db = new Database();
-db.reset();
-
 //Websocket stuff should be moved to it's own controller.
 export type connection = SocketStream & {
   user?: User;
@@ -41,8 +42,10 @@ server.route({
   url: "/ws",
   wsHandler: WsHandler(server),
   handler: (req, reply) => {
-    console.log("http hit");
-    reply.send({ hello: "world" });
+    const file = join(__dirname, "view/index.html");
+
+    const stream = fs.createReadStream(file);
+    reply.type("text/html").send(stream);
   },
 });
 
