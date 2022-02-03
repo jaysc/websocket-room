@@ -27,8 +27,8 @@ class Action {
 export const ParseData = (payload: RawData, user: User): Action | null => {
   try {
     let parsedData = JSON.parse(payload.toString());
-    console.log(parsedData);
     const methodName = _.get(parsedData, "method");
+    console.log(parsedData);
 
     let parsedMethod = Route(methodName);
     if (parsedMethod) {

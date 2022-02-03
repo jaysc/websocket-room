@@ -6,8 +6,9 @@ import type { Result } from "../actions";
 export type uuid = string & { readonly _: unique symbol };
 
 export class Room {
-  public id: uuid;
   #Password?: string;
+
+  public id: uuid;
   public userIds: Array<string> = [];
 
   public name: string;
