@@ -40,12 +40,32 @@
                 return "Connected!";
             }
 
-            joinRoom = () => {
+            joinRoom = (roomName, password) => {
                 var msg = {
                     method: "JoinRoom",
                     data: {
-                        name: "test"
+                        name: roomName || "test",
+                        password: password || ""
                     }
+                };
+
+                this.websocket.send(JSON.stringify(msg));
+            }
+
+            sendMessage = (message) => {
+                var msg = {
+                    method: "Message",
+                    data: {
+                        message: message
+                    }
+                };
+
+                this.websocket.send(JSON.stringify(msg));
+            }
+
+            leaveRoom = () => {
+                var msg = {
+                    method: "LeaveRoom",
                 };
 
                 this.websocket.send(JSON.stringify(msg));
@@ -60,6 +80,8 @@
                 return (<div>
                     <Connect connectWs={this.connectWs} setData={this.setData} />
                     <JoinRoom joinRoom={this.joinRoom} setData={this.setData} />
+                    <Message sendMessage={this.sendMessage} setData={this.setData} />
+                    <LeaveRoom leaveRoom={this.leaveRoom} setData={this.setData} />
                     <ConsoleLog data={this.state.data} />
                 </div>)
             }
@@ -75,7 +97,7 @@
 
             const handler = (event) => {
                 event.preventDefault();
-                let result = connectWs();
+                const result = connectWs();
                 setData(result)
             }
 
@@ -85,16 +107,60 @@
         }
 
         function JoinRoom(props) {
+            const roomNameInput = React.createRef();
+            const passwordInput = React.createRef();
             const { joinRoom, setData } = props;
 
             const handler = (event) => {
                 event.preventDefault();
-                let result = joinRoom();
+                const result = joinRoom(roomNameInput.current.value, passwordInput.current.value);
                 setData(result)
             }
 
             return (
-                <button type="button" onClick={handler}>Connect to WS</button>
+                <div>
+                    <label for="roomName">Room name:</label>
+                    <input id="roomName" ref={roomNameInput} type="text" />
+                    <label for="password">Password (if applicable):</label>
+                    <input id="password" ref={passwordInput} type="text" />
+                    <button type="button" onClick={handler}>Join room</button>
+                </div>
+            )
+        }
+
+        function LeaveRoom(props) {
+            const { leaveRoom, setData } = props;
+
+            const handler = (event) => {
+                event.preventDefault();
+                const result = leaveRoom();
+                setData(result)
+            }
+
+            return (
+                <button type="button" onClick={handler}>Leave room</button>
+            )
+        }
+
+        function Message(props) {
+            const textInput = React.createRef();
+            const { sendMessage, setData } = props;
+
+            const handler = (event) => {
+                event.preventDefault();
+                const message = textInput.current.value;
+                if (message)
+                {
+                    const result = sendMessage(message);
+                    setData(result)
+                }
+            }
+
+            return (
+                <div>
+                    <input ref={textInput} type="text" />
+                    <button type="button" onClick={handler} >Send Message </button>
+                </div>
             )
         }
 

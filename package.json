@@ -7,7 +7,9 @@
   "node": "^12.20.0 || ^14.13.1 || >=16.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/index.js\"",
+    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"npm run dev:start\"",
+    "dev:start": "npm run view && node \"./dist/index.js\"",
+    "view": "cp -r ./src/view/ ./dist/",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

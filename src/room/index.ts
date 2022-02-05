@@ -74,7 +74,6 @@ export class Rooms {
       room = new Room(name, password);
       this.#rooms[room.id] = room;
 
-      console.log("Room created");
       user.JoinRoom(room);
     } else if (room.HasPassword()) {
       if (room.PasswordAccept(password)) {
