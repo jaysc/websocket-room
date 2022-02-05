@@ -10,7 +10,9 @@ You can create a passworded room, and communicate to other clients via a basic m
 
 Each connection is assigned a `client` ID.
 
-The websocket can be accessed at `localhost:8080/ws`. A very simple react front-end page has been created in order to play around, otherwise you can use postman. Multiple connections can be made by opening additional tabs.
+The websocket can be accessed at `localhost:8080/ws`. A very simple react front-end page has been created in order to play aroundMultiple connections can be made by opening additional tabs.
+
+See `./src/actions` methods for the API requirments.
 
 The postman folder contains some examples of queries you can send.
 
